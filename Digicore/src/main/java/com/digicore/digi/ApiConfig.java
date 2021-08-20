@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -146,6 +147,7 @@ public class ApiConfig {
 				data.setBalance(balance.get(i));
 				data.setNarration("Withdrawal");
 				data.setDate(logic.date());
+				data.setTransactiontype("Withdrawal");
 			}
 		}
 		
@@ -185,23 +187,82 @@ public class ApiConfig {
 				}
 			});
 			
-//			File file1 = new File("./src/main/resources/api/transactionstatement.json");
-//			JSONParser pass1 = new JSONParser();
-//			FileReader read1 = new FileReader(file1);
-//			Object obj1 = pass1.parse(read1);
-//			JSONArray list1 = (JSONArray) obj1;
-//		
-//			JSONObject send = new JSONObject();
-//			send.put("Full_Name", data.getFullname());
-//			send.put("Username", data.getUsername());
-//			send.put("Password", data.getPassword());
-//			send.put("Account_Number", data.getAccountnumber());
-//			send.put("Initial_Deposit", data.getInitialdeposit());
-//			list1.add(send);
-//			
-//			FileWriter write = new FileWriter(file1);
-//			write.write(list1.toJSONString());
-//			write.flush();
+			
+			File file1 = new File("./src/main/resources/api/transactionstatement.json");
+			JSONParser pass1 = new JSONParser();
+			FileReader read1 = new FileReader(file1);
+			Object obj1 = pass1.parse(read1);
+			JSONArray list1 = (JSONArray) obj1;
+			list1.forEach((each) -> {
+				JSONObject readd = (JSONObject) each;
+				String id = (String) readd.get("id");
+				String Account_Number = (String) readd.get("Account_Number");
+				String Date = (String) readd.get("Date");
+				
+				if(Account_Number == null && id.equals("0")){
+					
+					int x = list1.indexOf(each);
+					JSONObject send = new JSONObject();
+					send.put("id", "1");
+					
+					JSONObject send1 = new JSONObject();
+					send1.put("Account_Number", data.getAccountnumber());
+					send1.put("Date", data.getDate());
+					send1.put("Transaction_Type", data.getTransactiontype());
+					send1.put("Narration", data.getNarration());
+					send1.put("Amount", data.getAmount());
+					send1.put("Balance", balance);
+					
+					list1.set(x, send);
+					list1.add(send1);
+					
+
+					try{
+						FileWriter write = new FileWriter(file1);
+						write.write(list1.toJSONString());
+						write.flush();
+					
+					}catch(Exception e){
+						System.out.println(e);
+					}
+					
+					
+				}else{
+					if(Account_Number == null){
+						
+					}else if(Account_Number.equals(data.getAccountnumber()) && Date.equals(data.getDate())){
+						System.out.println("Duplicate Transaction");
+					}else{
+						
+						JSONObject send1 = new JSONObject();
+						send1.put("Account_Number", data.getAccountnumber());
+						send1.put("Date", data.getDate());
+						send1.put("Transaction_Type", data.getTransactiontype());
+						send1.put("Narration", data.getNarration());
+						send1.put("Amount", data.getAmount());
+						send1.put("Balance", balance);
+						
+						list1.add(send1);
+
+
+						try{
+							FileWriter write = new FileWriter(file1);
+							write.write(list1.toJSONString());
+							write.flush();
+
+						}catch(Exception e){
+							System.out.println(e);
+						}
+						
+					}
+				}
+				
+				
+				
+				
+				
+				
+			});
 			
 		}catch(Exception e){
 			System.out.println(e);
@@ -210,6 +271,208 @@ public class ApiConfig {
 	
 	
 	}
+	
+	
+	
+	public void getdepositInformation(UserData data, String accnum){
+		
+		ArrayList<String> accountnumber = getdetailslist("Account_Number", "accountstatement.json");
+		ArrayList<String> balance = getdetailslist("Balance", "accountstatement.json");
+		
+		for(int i = 0; i < accountnumber.size(); i++){
+			if(accountnumber.get(i).equals(accnum)){
+				data.setAccountnumber(accountnumber.get(i));
+				data.setBalance(balance.get(i));
+				data.setNarration("Deposit");
+				data.setDate(logic.date());
+				data.setTransactiontype("Deposit");
+			}
+		}
+		
+	}
+	
+	
+	public void setdepositInformation(UserData data, String balance){
+		
+		try{
+			File file = new File("./src/main/resources/api/accountstatement.json");
+			JSONParser pass = new JSONParser();
+			FileReader read = new FileReader(file);
+			Object obj = pass.parse(read);
+			JSONArray list = (JSONArray) obj;
+			System.out.println(list);
+			list.forEach((each) -> {
+				JSONObject readd = (JSONObject) each;
+				String accountnumber = (String) readd.get("Account_Number");
+				if(accountnumber.equals(data.getAccountnumber())){
+					
+					int x = list.indexOf(each);
+					JSONObject send = new JSONObject();
+					send.put("Account_Number", data.getAccountnumber());
+					send.put("Balance", balance);
+					list.set(x, send);
+					try{
+						
+						FileWriter write = new FileWriter(file);
+						write.write(list.toJSONString());
+						write.flush();
+					
+					}catch(Exception e){
+						System.out.println(e);
+					}
+//					
+					
+					
+				}
+			});
+			
+			
+			File file1 = new File("./src/main/resources/api/transactionstatement.json");
+			JSONParser pass1 = new JSONParser();
+			FileReader read1 = new FileReader(file1);
+			Object obj1 = pass1.parse(read1);
+			JSONArray list1 = (JSONArray) obj1;
+			list1.forEach((each) -> {
+				JSONObject readd = (JSONObject) each;
+				String id = (String) readd.get("id");
+				String Account_Number = (String) readd.get("Account_Number");
+				String Date = (String) readd.get("Date");
+				
+				if(Account_Number == null && id.equals("0")){
+					
+					int x = list1.indexOf(each);
+					JSONObject send = new JSONObject();
+					send.put("id", "1");
+					
+					JSONObject send1 = new JSONObject();
+					send1.put("Account_Number", data.getAccountnumber());
+					send1.put("Date", data.getDate());
+					send1.put("Transaction_Type", data.getTransactiontype());
+					send1.put("Narration", data.getNarration());
+					send1.put("Amount", data.getAmount());
+					send1.put("Balance", balance);
+					
+					list1.set(x, send);
+					list1.add(send1);
+					
+
+					try{
+						FileWriter write = new FileWriter(file1);
+						write.write(list1.toJSONString());
+						write.flush();
+					
+					}catch(Exception e){
+						System.out.println(e);
+					}
+					
+					
+				}else{
+					if(Account_Number == null){
+						
+					}else if(Account_Number.equals(data.getAccountnumber()) && Date.equals(data.getDate())){
+						System.out.println("Duplicate Transaction");
+					}else{
+						
+						JSONObject send1 = new JSONObject();
+						send1.put("Account_Number", data.getAccountnumber());
+						send1.put("Date", data.getDate());
+						send1.put("Transaction_Type", data.getTransactiontype());
+						send1.put("Narration", data.getNarration());
+						send1.put("Amount", data.getAmount());
+						send1.put("Balance", balance);
+						
+						list1.add(send1);
+
+
+						try{
+							FileWriter write = new FileWriter(file1);
+							write.write(list1.toJSONString());
+							write.flush();
+
+						}catch(Exception e){
+							System.out.println(e);
+						}
+						
+					}
+				}
+				
+				
+				
+				
+				
+				
+			});
+			
+		}catch(Exception e){
+			System.out.println(e);
+		}
+		
+	
+	
+	}
+	
+	
+	
+	public void getaccountstatement(UserData data, String accnum){
+		
+		try{
+			
+			File file1 = new File("./src/main/resources/api/transactionstatement.json");
+			JSONParser pass1 = new JSONParser();
+			FileReader read1 = new FileReader(file1);
+			Object obj1 = pass1.parse(read1);
+			JSONArray list1 = (JSONArray) obj1;
+			list1.forEach((each) -> {
+				
+				JSONObject readd = (JSONObject) each;
+				String Account_Number = (String) readd.get("Account_Number");
+				String Date = (String) readd.get("Date");
+				String Transaction_Type = (String) readd.get("Transaction_Type");
+				String Narration = (String) readd.get("Narration");
+				String Amount = (String) readd.get("Amount");
+				String Balance = (String) readd.get("Balance");
+				
+				if(Account_Number == null){
+
+				}else if(Account_Number.equals(accnum)){
+					
+					data.setAccountnumber(Account_Number);
+					data.setDate(Date);
+					data.setTransactiontype(Transaction_Type);
+					data.setNarration(Narration);
+					data.setAmount(Amount);
+					data.setBalance(Balance);
+					
+				}
+				
+				
+			});
+			
+		}catch(Exception e){
+			System.out.println(e);
+		}
+		
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

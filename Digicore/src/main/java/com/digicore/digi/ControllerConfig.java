@@ -99,8 +99,9 @@ public class ControllerConfig {
 	@RequestMapping("/statement")
 	public String viewstatmentpage(Model model){
 		
-		
+		Principal principal = SecurityContextHolder.getContext().getAuthentication();
 		UserData data = new UserData();
+		api.getaccountstatement(data, principal.getName());
 		model.addAttribute("data", data);
 		
 		return "statement";
@@ -121,7 +122,7 @@ public class ControllerConfig {
 			
 		}else{
 			
-			
+			api.setWithdrawalInformation(data, Integer.toString(amountrem));
 			return "responsepage";
 			
 		}
@@ -131,7 +132,23 @@ public class ControllerConfig {
 	@RequestMapping(value = "/performdeposit", method = RequestMethod.POST)
 	public String performdeposit(@ModelAttribute("data") UserData data){
 		
-		return "responsepage";
+		
+		Principal principal = SecurityContextHolder.getContext().getAuthentication();
+		api.getdepositInformation(data, principal.getName());
+		
+		int amountrem = Integer.parseInt(data.getBalance()) + Integer.parseInt(data.getAmount());
+		
+		if(Integer.parseInt(data.getAmount()) > 1000000 || Integer.parseInt(data.getAmount()) < 1){
+			
+			
+			return "deposit";
+			
+		}else{
+			
+			api.setWithdrawalInformation(data, Integer.toString(amountrem));
+			return "responsepage";
+			
+		}
 		
 	}
 	

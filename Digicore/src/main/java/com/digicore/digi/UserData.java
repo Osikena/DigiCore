@@ -22,6 +22,7 @@ public class UserData {
 	private String amount;
 	private String narration;
 	private String date;
+	private String transactiontype;
 
 	public String getUsername() {
 		return username;
@@ -94,8 +95,16 @@ public class UserData {
 	public void setDate(String date) {
 		this.date = date;
 	}
-	
 
+	public String getTransactiontype() {
+		return transactiontype;
+	}
+
+	public void setTransactiontype(String transactiontype) {
+		this.transactiontype = transactiontype;
+	}
+	
+	
 	
 	
 	
